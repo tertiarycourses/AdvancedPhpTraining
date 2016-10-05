@@ -1,0 +1,119 @@
+library(psych)
+library(lsr)
+data <- read.csv('~/Dropbox/Homeshare/data/data/data.csv', header = T)
+describe(data)
+
+t.test(data$First_year_reading, data$Entry_reading, paired = T) #comparing first year with reading @ entry paired t-test
+
+cohensD(data$First_year_reading, data$Entry_reading, method = 'paired') # effect size for first year intervention on reading
+
+t.test(data$Second_year_reading, data$First_year_reading, paired = T) # reading first year vs. reading second year paired t-test
+
+
+t.test(data$Third_year_reading, data$Second_year_reading, paired = T) # reading second year vs. reading third year paired t-test
+
+
+readingBelow1SD <- subset(data, data$Entry_reading <= 85) #subsetting data for readers below 1SD
+edit(readingBelow1SD)
+
+t.test(readingBelow1SD$First_year_reading, readingBelow1SD$Entry_reading, paired = T) # poor readers (below 1SD) entry reading vs. First year reading paired t-test
+
+cohensD(readingBelow1SD$First_year_reading, readingBelow1SD$Entry_reading, method = "paired") # effect size for below 1SD readers after 1 year of intervention
+
+t.test(readingBelow1SD$Second_year_reading, readingBelow1SD$First_year_reading, paired = T) # reading first year vs. reading second year paired t-test for below 1SD readers
+
+
+
+normal.read <- subset(data, data$Entry_reading >85) # subsetting data for normal readers
+t.test(normal.read$First_year_reading, normal.read$Entry_reading, paired =T) #paired t-test to compare reading @ entry vs first year
+cohensD(normal.read$First_year_reading, normal.read$Entry_reading, method = "paired") # effect size for normal readers  after 1 year of intervention
+
+t.test(normal.read$Second_year_reading, normal.read$First_year_reading, paired =T) #paired t-test to compare reading @ entry vs first year
+cohensD(normal.read$First_year_reading, normal.read$Entry_reading, method = "paired") # effect size for normal readers  after 1 year of intervention
+
+#Spelling
+
+t.test(data$First_year_spelling, data$Entry_spelling, paired = T) #comparing first year with spelling @ entry paired t-test
+cohensD(data$First_year_spelling, data$Entry_spelling, method = 'paired') # effect size for first year intervention on spelling
+
+t.test(data1$Second_year_spelling, data1$First_year_spelling, paired = T) #comparing first year with spelling @ second year paired t-test
+
+t.test(data1$Third_year_spelling, data1$Second_year_spelling, paired = T) #comparing second year with spelling @ third year paired t-test
+
+#subsetting data for spelling
+
+spell.low <- subset(data, data$Entry_spelling <= 85, na.action = na.exclude)
+spell.normal <- subset(data, data$Entry_spelling > 85, na.action = na.exclude)
+
+t.test(spell.low$First_year_spelling, spell.low$Entry_spelling, paired = T) #comparing first year with spelling @ entry paired t-test for low.spellers
+cohensD(spell.low$First_year_spelling, spell.low$Entry_spelling, method = 'paired') # effect size for first year intervention on spelling
+t.test(spell.low$Second_year_spelling, spell.low$First_year_spelling, paired = T) #comparing first year with spelling @ second year paired t-test for low spellers
+
+t.test(spell.low$Third_year_spelling, spell.low$Second_year_spelling, paired = T) #comparing second year with spelling @ third year paired t-test for low spellers
+
+t.test(spell.normal$First_year_spelling, spell.normal$Entry_spelling, paired = T) #comparing first year with spelling @ entry paired t-test for normal.spellers
+cohensD(spell.normal$First_year_spelling, spell.normal$Entry_spelling, method = 'paired') # effect size for first year intervention on spelling
+t.test(spell.normal$Second_year_spelling, spell.normal$First_year_spelling, paired = T) #comparing first year with spelling @ second year paired t-test for normal spellers
+t.test(spell.normal$Third_year_spelling, spell.normal$Second_year_spelling, paired = T) #comparing second year with spelling @ third year paired t-test for normal spellers
+
+# effect on removing outliers
+data.reading.outliers.removed <- subset(data,data$Entry_reading > 70.53 & data$Entry_reading < 111.25) #removing reading@ entry outliers 2SD from mean
+
+t.test(data.reading.outliers.removed$First_year_reading, data.reading.outliers.removed$Entry_reading, paired = T) #paired t.test after reading outliers removed - entry vs first year
+
+cohensD(data.reading.outliers.removed$First_year_reading, data.reading.outliers.removed$Entry_reading, method = 'paired')
+t.test(data.reading.outliers.removed$Second_year_reading, data.reading.outliers.removed$First_year_reading, paired = T) # reading first year vs. reading second year paired t-test for outliers removed
+
+data.spelling.outliers.removed <- subset(data, data$Entry_spelling >71.36 & data$Entry_spelling < 112.56) #removing spelling outliers
+
+t.test(data.spelling.outliers.removed$First_year_spelling, data.spelling.outliers.removed$Entry_spelling, paired = T)
+cohensD(data.spelling.outliers.removed$First_year_spelling, data.spelling.outliers.removed$Entry_spelling, method = 'paired') # effect size for first year intervention on spelling
+
+t.test(data.spelling.outliers.removed$Second_year_spelling, data.spelling.outliers.removed$First_year_spelling, paired = T) #comparing first year with spelling second year paired t-test for outliers removed
+
+data$read.diff <- data$First_year_reading - data$Entry_reading # creating a separate column for diff between entry and 1st year reading
+
+data$spell.diff <- data$First_year_spelling - data$Entry_spelling
+cor.test(data$Age.entry_mths, data$read.diff) #correlation between age of entry and 1st year reading gains
+cor.test(data$Entry_reading, data$read.diff)
+
+#linear model for predicting reading gains after 1 year
+cor(data[, c('read.diff', 'Entry_reading','BAS_VC','Age.entry_mths','PHAB_RHY', 'PHAB_NW','PHAB_NSP', 'PHAB_NSD','BAS_RDB')]) #first look at theoretical correlations
+model1.reading <- lm(data$read.diff ~ data$Entry_reading)
+summary(model1.reading)
+model2.reading <- lm(data$read.diff ~ data$Entry_reading + data$Age.entry_mths)
+summary(model2.reading)
+anova(model1.reading, model2.reading)
+library(QuantPsyc)
+lm.beta(model1.reading)
+lm.beta(model2.reading)
+
+#liner model for predicting spelling gains after 1 year
+cor(data[, c('spell.diff', 'Entry_spelling','BAS_VC','Age.entry_mths','PHAB_RHY')]) #first look at theoretical correlations
+cor.test(data$spell.diff, data$Entry_spelling)
+cor.test(data$spell.diff, data$BAS_VC)
+cor.test(data$spell.diff, data$Age.entry_mths)
+summary(model1.spelling <- lm(data$spell.diff ~ data$Entry_spelling))
+lm.beta(model1.spelling)
+summary(model2.spelling <- lm(data$spell.diff ~ data$Entry_spelling + data$Age.entry_mths))
+lm.beta(model2.spelling)
+anova(model1.spelling, model2.spelling)
+
+#scatterplot for the relationship between reading and age at entry for entire sample
+library(MASS)
+scatter.read <- ggplot(data, aes(Age.entry_mths,read.diff))
+scatter.read + geom_point() + labs(x = 'Age beginning intervention' , y = 'Change in reading score') + geom_smooth(method = rlm) # adds regression line. You need the MASS package to do a robust linear model
+
+#scatterplot for different reading groups = below average and average
+scatter.read.group <- ggplot(data, aes(Age.entry_mths,read.diff, color = Reading.group))
+scatter.read.group + geom_point() + labs(y = 'change scores in reading' , x = 'Age beginning intervention', color = 'Reading.group') + geom_smooth(method = rlm, aes(fill = Reading.group))
+
+#scatterplot for relationship between spelling and age at entry
+scatter.spell <- ggplot(data, aes(Age.entry_mths, spell.diff))
+scatter.spell + geom_point()+labs(x = 'Age beginning intervention', y = 'change in spelling') + geom_smooth(method = rlm)
+
+#scatterplot for relationship between spelling and age at entry by groups
+scatter.spell.group <- ggplot(data, aes(Age.entry_mths, spell.diff, color = Spelling.group))
+scatter.spell.group + geom_point() + labs(x = 'Age beginning intervention', y = 'change scores in spelling', color = 'Spelling.group') + geom_smooth(method = rlm, aes(fill = Spelling.group))
+
+write.csv(data,'~/Dropbox/Homeshare/DAS data/DAS_IDA data/DAS-IDA2.csv')
