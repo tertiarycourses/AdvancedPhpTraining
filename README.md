@@ -1,5 +1,5 @@
 # Advanced PHP Training
-## by [Tertiary Infotech Pte. Ltd] (https://www.tertiarycourses.com.sg/)
+## by [Tertiary Infotech Pte. Ltd](https://www.tertiarycourses.com.sg/)
 
 These are the exercise files used for [Advanced PHP Training](https://www.tertiarycourses.com.sg/advanced-php-programming-training-in-singapore.html) course. 
 
