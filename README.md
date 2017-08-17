@@ -6,6 +6,7 @@ These are the exercise files used for [Advanced PHP Training](https://www.tertia
 The course outline can be found in 
 
 https://www.tertiarycourses.com.sg/advanced-php-programming-training-in-singapore.html
+https://www.tertiarycourses.com.my/advanced-php-programming-training-in-malaysia.html
 
 <p><strong>Module 1: Object Oriented Programming</strong></p>
 <ul>
